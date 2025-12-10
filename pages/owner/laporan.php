@@ -333,4 +333,56 @@ $db->close();
                                         // --- LOGIKA UTAMA TAMPILAN DATA ---
                                         if ($is_decrypted_mode) {
                                             // 1. Jika Mode Dekripsi Aktif -> Lakukan Decrypt & Format Rupiah
-                                            $pendapa
+                                            $pendapatan_raw = decrypt_data($arsip['total_pendapatan']);
+                                            
+                                            $tampil_pendapatan = "Rp " . number_format($pendapatan_raw, 0, ',', '.');
+                                            $style_class = "font-bold text-green-600 text-base"; // Teks hijau & tebal
+                                            $icon_status = "<span class='text-xs bg-green-100 text-green-700 px-2 py-1 rounded'><i class='fas fa-check-circle'></i> Terbaca</span>";
+                                        } else {
+                                            // 2. Jika Mode Enkripsi (Default) -> Tampilkan Kode Acak
+                                            $tampil_pendapatan = htmlspecialchars($arsip['total_pendapatan']);
+                                            $style_class = "font-mono text-xs text-red-600 break-all"; // Teks merah & font kode
+                                            $icon_status = "<span class='text-xs bg-red-100 text-red-700 px-2 py-1 rounded'><i class='fas fa-lock'></i> Aman</span>";
+                                        }
+                                    ?>
+
+                                    <tr>
+                                        <td class="px-6 py-4 font-medium text-gray-900"><?php echo $arsip['periode']; ?></td>
+                                        
+                                        <td class="px-6 py-4 <?php echo $style_class; ?>" style="max-width: 300px;">
+                                            <?php echo $tampil_pendapatan; ?>
+                                        </td>
+
+                                        <td class="px-6 py-4 text-gray-500"><?php echo date('d M Y H:i', strtotime($arsip['tanggal_dibuat'])); ?></td>
+                                        <td class="px-6 py-4"><?php echo $icon_status; ?></td>
+                                    </tr>
+                                <?php endforeach; ?>
+                            <?php endif; ?>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+            </div>
+    </main>
+</div>
+
+<div id="modalGenerate" class="fixed inset-0 bg-gray-900 bg-opacity-50 hidden flex items-center justify-center z-50">
+    <div class="bg-white rounded-xl shadow-2xl w-96 p-6">
+        <h3 class="text-xl font-bold text-gray-800 mb-4">Generate Laporan Bulanan</h3>
+        <p class="text-sm text-gray-600 mb-4">Pilih bulan untuk disimpan. Data akan <span class="font-bold text-red-600">DIENKRIPSI</span> di database.</p>
+        <form action="laporan.php" method="POST">
+            <input type="hidden" name="generate_laporan" value="1">
+            <div class="mb-4">
+                <label class="block text-sm font-medium text-gray-700 mb-1">Pilih Bulan</label>
+                <input type="month" name="bulan" required class="w-full border border-gray-300 rounded-lg px-3 py-2">
+            </div>
+            <div class="flex justify-end space-x-3">
+                <button type="button" onclick="document.getElementById('modalGenerate').classList.add('hidden')" class="px-4 py-2 bg-gray-200 rounded-lg">Batal</button>
+                <button type="submit" class="px-4 py-2 bg-purple-600 text-white rounded-lg">Simpan & Enkripsi</button>
+            </div>
+        </form>
+    </div>
+</div>
+
+<?php require_once '../../templates/footer_app.php'; ?>
